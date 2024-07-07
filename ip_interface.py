@@ -21,11 +21,12 @@ def configure_ip_address(username, password, hosts):
             # The list of commands entered on the device
             commands = [
                 f"interface {interface}",
-                f"ip address {ip_address} {netmask}",
+                f"ip address {ip_address} {netmask}"
             ]
 
             turn_on_interface = validate_input(f"Turn on interface {interface} (Y/N): ", expected_input=['Y', 'N'])
 
+            # If the user decides to turn on the interface
             if turn_on_interface == 'Y':
                 commands.append("no shutdown")
 
