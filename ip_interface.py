@@ -41,5 +41,3 @@ def configure_ip_address(username, password, hosts):
             print(interface_brief)
         except Exception as e:
             print(f"Error: {e} occured while configuring device")
-
-configure_ip_address('admin', 'cisco', '192.168.220.144, 192.168.220.143')
