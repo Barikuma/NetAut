@@ -1,44 +1,214 @@
-# This function is used to validate and return a DDN number entered by a user.
-def get_valid_ddn(prompt):
+def get_valid_ddn(subnet_mask=False, wildcard_mask=False):
     
-    # This loop validates the router ID entered by the user
     while True:
-        ddn_number = input(prompt)
 
-        # Splits each octet in the router ID and stores it as an element in a list
-        ddn_check = ddn_number.split(sep='.')
+        # If subnet mask is set to true
+        if subnet_mask:
+
+            # List of allowed octet values
+            allowed = [0, 128, 192, 224, 240, 248, 252, 254, 255]
+
+            # Will be used to check if a subnet mask is valid
+            valid = True
+
+            while True:
+
+                # Request for subnet mask
+                netmask = input("Subnet mask: ")
+
+                # Separate the string entered by the user, add each value to a list
+                check_mask = netmask.split(sep='.')
+
+                # Check if the values are up to 4
+                if len(check_mask) != 4:
+                    print("Subnet mask must be 4 DDN separated values")
+                    valid = False
+                    continue
+
+                # Check if the value of the first octet is zero
+                if int(check_mask[0]) == 0:
+                    print("Subnet mask cannot start with a zero")
+                    valid = False
+                    continue
+                
+                # Index variable
+                i = 0
+
+                for i in range(4):
+
+                    # If the value at the current index is an allowed value
+                    if int(check_mask[i]) in allowed:
+
+                        # If the value is 255, set valid to true and return to the top of the for loop
+                        if int(check_mask[i]) == 255:
+                            valid = True
+                            continue
+
+                         # If the value is an allowed value that is not 255, call the mask check function
+                        else:
+                            valid = mask_check(check_mask, i, subnet=True)
+
+                            # If the function call returns a False break
+                            if valid == False:
+                                break
+
+                    # if the value at the current index is not an allowed value
+                    else:
+                        print(f"{check_mask[i]} is not in the list of allowed values for a subnet mask")
+                        valid = False
+                        break
+                
+                 # If the final value of valid after the for loop is true, return the subnet mask entered by the user
+                if valid:
+                    return netmask
         
-        # Checks if the length of the values entered in the list is equal to 4.
-        # If not, it prompts the user and goes to the beginning of the loop
-        if len(ddn_check) != 4:
-            print("\nMust be 4 DDN separated values")
-            continue
+        # If wildcard mask is set to true
+        elif wildcard_mask:
 
-        # Checks if the first octet is a 0. If it is, it prompts the user and goes to the beginning of the loop
-        if ddn_check[0] == '0':
-            print("\nCannot start with a zero")
-            continue
-        
-        valid = True
+            # The allowed values an octet in a wildcard mask can have
+            allowed = [0, 1, 3, 7, 15, 31, 63, 127, 255]
 
-        # Loops through the elements in the list
-        for octet in ddn_check:
+            # Will be used to check if a wildcard mask is valid
+            valid = True
+
+            while True:
+
+                # Request the wildcard mask from the user
+                wildcard_mask = input("Wildcard mask: ")
+
+                # Make each octet an element of a list
+                check_wildcard_mask = wildcard_mask.split(sep='.')
+
+                # Check if there are 4 octets. If not prompt the user, set valid to false and return to the top of the loop
+                if len(check_wildcard_mask) != 4:
+                    print("Wildcard mask must be 4 DDN separated values")
+                    valid = False
+                    continue
+                
+                # Used to loop through the list check_wildcard_mask
+                i = 0
+
+                for i in range(4):
+
+                    # Check if the value at the current index is an allowed value
+                    if int(check_wildcard_mask[i]) in allowed:
+
+                        # If the value is 0, set valid to true and return to the top of the for loop
+                        if int(check_wildcard_mask[i]) == 0:
+                            valid = True
+                            continue
+
+                        # If the value is an allowed value that is not 0, call the mask check function
+                        else:
+                            valid = mask_check(check_wildcard_mask, i, wildcard=True)
+
+                            # If the function call returns a False break
+                            if valid == False:
+                                break
+
+                    # if the value at the current index is not an allowed value
+                    else:
+                        print(f"{check_wildcard_mask[i]} is not an allowed octet value")
+                        valid = False
+                        break
+
+                # If the final value of valid after the for loop is true, return the wildcard mask entered by the user
+                if valid:
+                    return wildcard_mask
+
+        # If neither subnet_mask and wildcard_mask is set to true, this block runs. This block of code configures an IP address
+        else:
+
+            # Requests the user to input an IP address
+            ip_address = input("Enter IP address: ")
+
+            # Splits each octet in the router ID and stores it as an element in a list
+            ip_address_check = ip_address.split(sep='.')
             
-            # Checks if an octet is not a digit. If not, it sets Valid to False and breaks out of the for loop
-            if not octet.isdigit():
-                print("\nCannot have a non digit")
-                valid = False
-                break
+            # Checks if the length of the values entered in the list is equal to 4.
+            # If not, it prompts the user and goes to the beginning of the loop
+            if len(ip_address_check) != 4:
+                print("\nMust be 4 DDN separated values")
+                continue
 
-            # Checks if the value of an octet is between 0 and 255. If not, it sets Valid to False and breaks out of the for loop
-            if int(octet) < 0 or int(octet) > 255:
-                print("\nOctet value must be between 0 and 255")
-                valid = False
-                break
-        
-        # Checks if valid is set to true. If not, it runs from the beginning of the loop again
-        if valid:
-            return ddn_number
+            # Checks if the first octet is a 0. If it is, it prompts the user and goes to the beginning of the loop
+            if ip_address_check[0] == '0':
+                print("\nIP address cannot start with a zero")
+                continue
+            
+            # Will be used to check if the IP address entered by the user is valid
+            valid = True
+
+            # Loops through the elements in the list
+            for octet in ip_address_check:
+                
+                # Checks if an octet is not a digit. If not, it sets Valid to False and breaks out of the for loop
+                if not octet.isdigit():
+                    print("\nIP address cannot have a non digit")
+                    valid = False
+                    break
+
+                # Checks if the value of an octet is between 0 and 255. If not, it sets Valid to False and breaks out of the for loop
+                if int(octet) < 0 or int(octet) > 255:
+                    print("\nOctet value must be between 0 and 255")
+                    valid = False
+                    break
+            
+            # Checks if valid is set to true. If not, it runs from the beginning of the loop again
+            if valid:
+                return ip_address
+
+
+# This function is used to run the check for either wildcard mask or sunbet mask.
+# It runs the check for the remaining elements in the list after the current element.
+def mask_check(mask, index, subnet=False, wildcard=False):
+    valid = True
+
+    # The index value of the next element
+    i = index + 1
+    
+    # If the index is <= 3 which is the highest index of the list
+    if i <= 3:
+
+        # While the index is less than 3, run the loop and increment the index by 1
+        while i <= 3:
+
+            # If the subnet argument is set to true
+            if subnet:
+
+                # If the value at index i is not 0, inform the user, set valid to false and break out of while loop
+                if int(mask[i]) != 0:
+                    print(f"Invalid subnet mask. Cannot have a non-zero after {int(mask[index])}")
+                    valid = False
+                    break
+                # If the value at the current index is 0, increment i by 1, set valid to true and continue the while loop
+                else:
+                    i += 1
+                    valid = True
+                    continue
+
+            # If the wildcard argument is set to true
+            elif wildcard:
+
+                # If the value at index i is not 255, inform the user, set valid to false and break out of while loop
+                if int(mask[i]) != 255:
+                    print(f"Cannot have a value that isn't 255 after {mask[index]}")
+                    valid = False
+                    break
+
+                # If the value at the current index is 255, increment i by 1, set valid to true and continue the while loop
+                else:
+                    i += 1
+                    valid = True
+                    continue
+    # This checks if the new index is 4 valis is True. New index can only be 4 if the current index is 3 (which is the index of the last element)
+    elif i == 4:
+        valid = True
+    
+    # Returns valid
+    return valid
+
+
 
 # This function checks if the user inputs an integer when requested to
 def validate_input(prompt, expected_input=None, allow_int=False):

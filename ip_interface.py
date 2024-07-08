@@ -15,8 +15,8 @@ def configure_ip_address(username, password, hosts):
         try:
             # Requests for the parameters needed to be configured from the user
             interface = input("\nInterface: ")
-            ip_address = get_valid_ddn("IP Address: ")
-            netmask = get_valid_ddn("Subnet mask: ")
+            ip_address = get_valid_ddn()
+            netmask = get_valid_ddn(subnet_mask=True)
 
             # The list of commands entered on the device
             commands = [
@@ -32,7 +32,7 @@ def configure_ip_address(username, password, hosts):
 
             with ConnectHandler(**device) as device__:
             # Sends the set of commands to the device
-                device__.send_config_set(commands)
+                print(device__.send_config_set(commands))
 
                 # Command to verify the ip address was configured on the interface
                 interface_brief = device__.send_command("show ip interface brief")
@@ -41,3 +41,4 @@ def configure_ip_address(username, password, hosts):
             print(interface_brief)
         except Exception as e:
             print(f"Error: {e} occured while configuring device")
+
