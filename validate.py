@@ -1,4 +1,4 @@
-def get_valid_ddn(subnet_mask=False, wildcard_mask=False):
+def get_valid_ddn(prompt=None, subnet_mask=False, wildcard_mask=False):
     
     while True:
 
@@ -14,7 +14,7 @@ def get_valid_ddn(subnet_mask=False, wildcard_mask=False):
             while True:
 
                 # Request for subnet mask
-                netmask = input("Subnet mask: ")
+                netmask = input(f"{prompt}")
 
                 # Separate the string entered by the user, add each value to a list
                 check_mask = netmask.split(sep='.')
@@ -74,7 +74,7 @@ def get_valid_ddn(subnet_mask=False, wildcard_mask=False):
             while True:
 
                 # Request the wildcard mask from the user
-                wildcard_mask = input("Wildcard mask: ")
+                wildcard_mask = input(f"{prompt}")
 
                 # Make each octet an element of a list
                 check_wildcard_mask = wildcard_mask.split(sep='.')
@@ -120,7 +120,7 @@ def get_valid_ddn(subnet_mask=False, wildcard_mask=False):
         else:
 
             # Requests the user to input an IP address
-            ip_address = input("Enter IP address: ")
+            ip_address = input(f"{prompt}")
 
             # Splits each octet in the router ID and stores it as an element in a list
             ip_address_check = ip_address.split(sep='.')
@@ -242,3 +242,10 @@ def validate_input(prompt, expected_input=None, allow_int=False):
 
         except ValueError as ve:
             print(ve)
+
+
+# This function is used to get the hostname of the device
+def get_hostname(device):
+    output = device.send_command("show start | include hostname").split()
+    hostname = output[1]
+    return hostname
