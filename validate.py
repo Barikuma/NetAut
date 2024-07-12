@@ -1,3 +1,6 @@
+from getpass import getpass
+from netmiko import ConnectHandler
+
 def get_valid_ddn(prompt=None, subnet_mask=False, wildcard_mask=False):
     
     while True:
@@ -249,3 +252,37 @@ def get_hostname(device):
     output = device.send_command("show start | include hostname").split()
     hostname = output[1]
     return hostname
+
+# This function checks if the user requested to configure hosts that are available to be configured
+def check_hosts(hostnames):
+    # Accepts input from the user
+    host_to_configure = input("Hosts to configure (if more than one, separate with a comma): ").upper()
+
+    # Strips off spaces after a comma in the user input
+    strip_spaces = ''.join(s.strip() for s in host_to_configure)
+
+    # Adds each separated value in stri_spaces to a list
+    host_to_configure = strip_spaces.split(sep=',')
+
+    valid_hosts = True
+    unavailable_hosts = []
+
+    # Loops through the hosts entered by the user and appends any unavailable host entered by the user to a list
+    for host in host_to_configure:
+        if not host in hostnames:
+            unavailable_hosts.append(host)
+
+    # If there unavailable hosts, prompt the user and set valid_hosts to false
+    if unavailable_hosts:
+        if len(unavailable_hosts) > 1:
+            print(f"Hosts", *unavailable_hosts, "is not in the list of available devices")
+        else:
+            print(f"Host", *unavailable_hosts, "is not in the list of available devices")
+        valid_hosts = False
+    
+    # If the hosts entered by the user is valid, break out of the while loop
+    if valid_hosts:
+        return [True, host_to_configure]
+
+
+
