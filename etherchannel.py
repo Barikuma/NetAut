@@ -70,8 +70,9 @@ def etherchannel(hosts, username, password):
 
 
 if __name__ == '__main__':
-    hosts = ['AS1', 'AS2']
     username = input("Username: ")
     password = getpass()
+    
+    hosts = []      # Insert hosts here
 
     etherchannel(hosts, username, password)
