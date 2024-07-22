@@ -286,3 +286,27 @@ def check_hosts(hostnames):
 
 
 
+
+# This function connects to the device and sends the commands
+def connect(hosts, username, password, config_mode_command, priv_mode_command):
+
+    # If the hosts parameter contains just one string, convert the string to a list
+    if isinstance(hosts, str):
+        hosts = [hosts]
+    
+    # Loop through the hosts list, connect to each device and send the command
+    for host in hosts:
+        device = {
+            'device_type': 'cisco_ios',
+            'host': host,
+            'username': username,
+            'password': password
+        }
+
+        # Connect, send command to device print output of show command
+        with ConnectHandler(**device) as device__:
+            device__.send_config_set(config_mode_command)
+            show_output = device__.send_command(priv_mode_command)
+        
+        print(f"\nHost {host}\n{show_output}")
+
